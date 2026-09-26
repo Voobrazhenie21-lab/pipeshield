@@ -1,0 +1,26 @@
+# VULNERABLE CI/CD WORKFLOW (For PipeShield Testing)
+# Violations:
+# 1. Overly permissive write-all permissions [PS-CICD-001]
+# 2. Unpinned third-party action using mutable tag @v3 [PS-CICD-002]
+# 3. Untrusted PR context expression injection into shell [PS-CICD-003]
+# 4. Missing timeout-minutes directive [PS-CICD-005]
+
+name: Production Deploy
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions: write-all
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build artifact
+        run: |
+          echo "Building PR release for: ${{ github.event.pull_request.title }}"
+          python setup.py build

@@ -1,0 +1,50 @@
+[project]
+name = "pipeshield"
+version = "0.1.0"
+description = "Modern DevSecOps security scanner for Secrets, Dockerfile hardening, and CI/CD supply chain risks"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Security Engineer", email = "devsecops@example.com" }
+]
+keywords = [
+    "security",
+    "devsecops",
+    "appsec",
+    "secret-detection",
+    "docker-security",
+    "cicd-security",
+    "sarif",
+    "github-actions"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Topic :: Security",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "click>=8.1.0",
+    "pyyaml>=6.0.0",
+    "rich>=13.0.0",
+]
+
+[project.scripts]
+pipeshield = "pipeshield.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.12.3,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+]

@@ -1,0 +1,42 @@
+name: DevSecOps Security Scan (PipeShield Dogfooding)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 8 * * 1' # Weekly security audit
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  pipeshield-scan:
+    name: PipeShield Repository Security Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde5c8fafcde5c04619f5ecd0426728247c1b # v4.1.1
+
+      - name: Set up Python
+        uses: actions/setup-python@0a5c61591373683505ea898e09a8ea4db9642864 # v5.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Install PipeShield
+        run: |
+          pip install .
+
+      - name: Run PipeShield Security Scan
+        run: |
+          pipeshield scan src/ --sarif pipeshield-results.sarif --fail-on high
+
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@cdcdbb579706841c47f7063dda365e292e5cad7a # v3.24.8
+        if: always()
+        with:
+          sarif_file: pipeshield-results.sarif

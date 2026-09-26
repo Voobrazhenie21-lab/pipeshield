@@ -1,0 +1,16 @@
+# ==============================================================================
+# PipeShield Suppression & Baseline Ignore Configuration
+# ==============================================================================
+# Use this file to suppress false positives or accepted architectural risks.
+
+# 1. Path or Glob Exclusions
+examples/vulnerable_project/*
+tests/fixtures/*
+docs/sample_code.py
+
+# 2. Global Rule Suppressions (suppresses rule across all files)
+# PS-SEC-009
+
+# 3. Targeted Rule Suppressions (rule_id:file_pattern)
+# PS-DOCK-001:Dockerfile.local
+# PS-CICD-002:.github/workflows/experimental.yml
