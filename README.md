@@ -5,6 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![SARIF 2.1.0](https://img.shields.io/badge/SARIF-2.1.0%20Compliant-purple.svg)]()
 [![Security](https://img.shields.io/badge/DevSecOps-Ready-00C7B7.svg)]()
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Interactive_Security_Dashboard-success?style=for-the-badge&logo=googlechrome&logoColor=white)](https://voobrazhenie21-lab.github.io/pipeshield/)
 
 > **PipeShield** is a fast, modular DevSecOps security linter and static analyzer built for developers and AppSec engineers. It audits source code and infrastructure-as-code for **hardcoded credentials**, **container hardening violations**, and **CI/CD supply chain risks**, with native **OASIS SARIF 2.1.0** export for GitHub Advanced Security integration.
 
