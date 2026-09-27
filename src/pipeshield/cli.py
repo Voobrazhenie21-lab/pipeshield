@@ -10,6 +10,7 @@ from rich.table import Table
 from pipeshield.config import Config
 from pipeshield.core.scanner import Scanner
 from pipeshield.formatters.console import render_console
+from pipeshield.formatters.html_out import export_html
 from pipeshield.formatters.json_out import export_json
 from pipeshield.formatters.sarif import export_sarif
 from pipeshield.models import Severity
@@ -50,6 +51,13 @@ def cli() -> None:
     help="Export findings to a JSON report file.",
 )
 @click.option(
+    "--html",
+    "html_out",
+    type=click.Path(dir_okay=False, writable=True),
+    default=None,
+    help="Export findings to an interactive HTML Dashboard report.",
+)
+@click.option(
     "--ignore-rule",
     "-i",
     multiple=True,
@@ -66,6 +74,7 @@ def scan_command(
     fail_on: str,
     sarif: str | None,
     json_out: str | None,
+    html_out: str | None,
     ignore_rule: tuple[str, ...],
     entropy_threshold: float,
 ) -> None:
@@ -99,6 +108,12 @@ def scan_command(
         json_path = Path(json_out)
         export_json(result, json_path)
         console.print(f"[bold green][+] JSON report exported to:[/] [cyan]{json_path}[/]")
+
+    # Export HTML Dashboard if requested
+    if html_out:
+        html_path = Path(html_out)
+        export_html(result, html_path)
+        console.print(f"[bold green][+] Interactive HTML Dashboard exported to:[/] [cyan]{html_path}[/]")
 
     # Exit code based on policy
     if result.summary.failed:

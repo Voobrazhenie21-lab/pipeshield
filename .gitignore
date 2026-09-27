@@ -8,3 +8,16 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Test and coverage artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Generated scan reports
+*.sarif
+*.html
+report.json
+results.json
+results.sarif
+dashboard.html

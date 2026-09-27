@@ -18,7 +18,7 @@ In modern software delivery, security vulnerabilities are far cheaper to fix bef
 - 🔑 **Secrets & Credential Detection**: High-entropy strings (Shannon entropy analysis) + deterministic regex rules for 40+ credential types (AWS, GitHub, OpenAI, Slack, Stripe, JWT, DB URIs, Private Keys).
 - 🐳 **Container Hardening (CIS Docker Benchmark)**: Flags root user execution (`USER root`), mutable `:latest` tags, plaintext credentials in `ENV`/`ARG`, `curl | sh` pipes, and missing health checks.
 - ⛓️ **CI/CD Supply Chain Security**: Detects `permissions: write-all`, unpinned GitHub Actions (mutable tags vs. 40-character commit SHAs), script injection via untrusted PR contexts, and dangerous `pull_request_target` checkouts.
-- 📊 **Enterprise Output Formats**: Rich interactive terminal output, machine-readable JSON, and standard **OASIS SARIF 2.1.0** for direct rendering in GitHub's **Security > Code scanning** tab.
+- 📊 **Enterprise Output Formats**: Rich interactive terminal tables, standalone **Interactive HTML Security Dashboard**, machine-readable **JSON**, and standard **OASIS SARIF 2.1.0** for direct rendering in GitHub's **Security > Code scanning** tab.
 - 🚀 **Zero External Dependencies**: Runs entirely offline in milliseconds without sending your proprietary code to third-party SaaS servers.
 
 ---
@@ -101,8 +101,8 @@ pipeshield scan .
 # Scan with policy enforcement (exit code 1 if CRITICAL or HIGH findings exist)
 pipeshield scan . --fail-on high
 
-# Export SARIF (for GitHub Code Scanning) and JSON reports
-pipeshield scan . --sarif results.sarif --json results.json
+# Export SARIF (GitHub Code Scanning), JSON, and interactive HTML Dashboard
+pipeshield scan . --sarif results.sarif --json results.json --html dashboard.html
 ```
 
 ### 2. View Security Rules Catalog
