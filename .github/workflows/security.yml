@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ main, master ]
   schedule:
-    - cron: '0 8 * * 1' # Weekly security audit
+    - cron: '0 8 * * 1'
 
 permissions:
   contents: read
@@ -20,17 +20,17 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@b4ffde5c8fafcde5c04619f5ecd0426728247c1b # v4.1.1
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Set up Python
-        uses: actions/setup-python@0a5c61591373683505ea898e09a8ea4db9642864 # v5.0.0
+        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
         with:
           python-version: "3.12"
 
       - name: Install PipeShield
         run: |
           python -m pip install --upgrade pip
-          pip install hatchling
+          pip install hatchling click pyyaml rich
           pip install .
 
       - name: Run PipeShield Security Scan
@@ -38,7 +38,7 @@ jobs:
           pipeshield scan src/ --sarif pipeshield-results.sarif --fail-on high
 
       - name: Upload SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@cdcdbb579706841c47f7063dda365e292e5cad7a # v3.24.8
+        uses: github/codeql-action/upload-sarif@6523f22ea01eb3fc2a1232b0a4534102d71921fc # v3.24.8
         if: always()
         continue-on-error: true
         with:
