@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PipeShield Security Audit Report</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --critical: #f85149;
+      --high: #ff7b72;
+      --medium: #d29922;
+      --low: #3fb950;
+      --info: #58a6ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 32px 24px; line-height: 1.5; }
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    /* Header */
+    header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .logo-badge { background: linear-gradient(135deg, #1f6feb, #8957e5); color: #fff; font-weight: 800; font-size: 22px; padding: 8px 16px; border-radius: 8px; letter-spacing: 1px; }
+    .brand-title h1 { font-size: 24px; font-weight: 700; color: #fff; }
+    .brand-title p { font-size: 13px; color: var(--text-muted); }
+    .status-badge { padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .status-failed { background: rgba(248, 81, 73, 0.15); color: var(--critical); border: 1px solid var(--critical); }
+    .status-passed { background: rgba(63, 185, 80, 0.15); color: var(--low); border: 1px solid var(--low); }
+
+    /* Meta bar */
+    .meta-bar { display: flex; gap: 24px; background: var(--card-bg); padding: 14px 20px; border-radius: 8px; border: 1px solid var(--border); font-size: 13px; margin-bottom: 28px; flex-wrap: wrap; }
+    .meta-item strong { color: #fff; }
+
+    /* Metric Cards Grid */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .metric-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; text-align: center; }
+    .metric-value { font-size: 36px; font-weight: 800; margin-bottom: 4px; }
+    .metric-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 600; }
+    .c-crit { color: var(--critical); }
+    .c-high { color: var(--high); }
+    .c-med { color: var(--medium); }
+    .c-low { color: var(--low); }
+    .c-total { color: #fff; }
+
+    /* Filters & Search */
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 16px; flex-wrap: wrap; }
+    .filter-tabs { display: flex; gap: 8px; }
+    .filter-btn { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+    .filter-btn:hover { border-color: var(--accent); color: #fff; }
+    .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .search-box { background: var(--card-bg); border: 1px solid var(--border); color: #fff; padding: 8px 14px; border-radius: 6px; font-size: 13px; width: 280px; outline: none; }
+    .search-box:focus { border-color: var(--accent); }
+
+    /* Findings List */
+    .findings-container { display: flex; flex-direction: column; gap: 14px; }
+    .finding-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; transition: transform 0.1s, border-color 0.2s; border-left: 4px solid var(--border); }
+    .finding-card:hover { border-color: #58a6ff; }
+    .finding-card.sev-CRITICAL { border-left-color: var(--critical); }
+    .finding-card.sev-HIGH { border-left-color: var(--high); }
+    .finding-card.sev-MEDIUM { border-left-color: var(--medium); }
+    .finding-card.sev-LOW { border-left-color: var(--low); }
+
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 12px; }
+    .rule-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .sev-pill { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; }
+    .pill-CRITICAL { background: rgba(248, 81, 73, 0.2); color: var(--critical); }
+    .pill-HIGH { background: rgba(255, 123, 114, 0.2); color: var(--high); }
+    .pill-MEDIUM { background: rgba(210, 153, 34, 0.2); color: var(--medium); }
+    .pill-LOW { background: rgba(63, 185, 80, 0.2); color: var(--low); }
+    .rule-id { font-family: monospace; font-size: 13px; font-weight: 700; color: var(--accent); }
+    .cwe-tag { font-size: 11px; color: var(--text-muted); background: #21262d; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+    .file-loc { font-family: monospace; font-size: 12px; color: var(--text-muted); background: #21262d; padding: 3px 8px; border-radius: 4px; }
+
+    .card-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 8px; }
+    .card-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+
+    .snippet-box { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 10px 14px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; color: #e6edf3; overflow-x: auto; margin-bottom: 10px; white-space: pre-wrap; word-break: break-all; }
+    .remediation-box { background: rgba(63, 185, 80, 0.08); border: 1px solid rgba(63, 185, 80, 0.3); border-radius: 6px; padding: 10px 14px; font-size: 13px; color: #7ee787; display: flex; gap: 8px; align-items: flex-start; }
+    .remediation-box strong { color: #fff; }
+
+    .no-findings { text-align: center; padding: 60px 20px; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); }
+    .no-findings h2 { color: var(--low); margin-bottom: 8px; font-size: 20px; }
+
+    footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo-badge">PipeShield</div>
+        <div class="brand-title">
+          <h1>Security Audit Dashboard</h1>
+          <p>Next-Gen DevSecOps Static Analysis & Secret Detection</p>
+        </div>
+      </div>
+      <div>
+        <span class="status-badge status-failed">Policy Failed</span>
+      </div>
+    </header>
+
+    <div class="meta-bar">
+      <div class="meta-item">Target: <strong>C:\Users\Алексей\.gemini\antigravity\scratch\pipeshield\examples\vulnerable_project</strong></div>
+      <div class="meta-item">Generated: <strong>2026-09-27 22:30:49</strong></div>
+      <div class="meta-item">Duration: <strong>45.27 ms</strong></div>
+      <div class="meta-item">Files Scanned: <strong>3</strong></div>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-value c-total">13</div>
+        <div class="metric-label">Total Findings</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value c-crit">4</div>
+        <div class="metric-label">Critical</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value c-high">6</div>
+        <div class="metric-label">High</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value c-med">1</div>
+        <div class="metric-label">Medium</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value c-low">2</div>
+        <div class="metric-label">Low</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="filter-tabs">
+        <button class="filter-btn active" onclick="filterSeverity('ALL')">All (13)</button>
+        <button class="filter-btn" onclick="filterSeverity('CRITICAL')">Critical (4)</button>
+        <button class="filter-btn" onclick="filterSeverity('HIGH')">High (6)</button>
+        <button class="filter-btn" onclick="filterSeverity('MEDIUM')">Medium (1)</button>
+        <button class="filter-btn" onclick="filterSeverity('LOW')">Low (2)</button>
+      </div>
+      <input type="text" id="searchInput" class="search-box" placeholder="Search rules, files, snippets..." onkeyup="searchFindings()">
+    </div>
+
+    <div class="findings-container" id="findingsContainer">
+      
+            <div class="finding-card sev-CRITICAL" data-severity="CRITICAL">
+              <div class="card-header">
+                <div class="rule-info">
+                  <span class="sev-pill pill-CRITICAL">CRITICAL</span>
+                  <span class="rule-id">PS-SEC-001</span>
+                  <span class="cwe-tag">CWE-798</span>
+                </div>
+                <div class="file-loc">config.py:7</div>
+              </div>
+              <div class="card-title">AWS Access Key ID exposed</div>
+              <div class="card-desc">Identified a standard AWS Access Key ID starting with &#x27;AKIA&#x27; or &#x27;ABIA&#x27;.</div>
+              <div class="snippet-box">AWS_ACCESS_KEY_ID = &quot;AKIA********MPLE&quot;</div>
+              <div class="remediation-box">
+                <div><strong>Fix:</strong> Revoke the exposed key in the AWS IAM Console immediately and use IAM Roles or environment variables in secrets manager.</div>
+              </div>
+            </div>
+            
+
+            <div class="finding-card sev-HIGH" data-severity="HIGH">
+              <div class="card-header">
+                <div class="rule-info">
+                  <span class="sev-pill pill-HIGH">HIGH</span>
+                  <span class="rule-id">PS-SEC-008</span>
+                  <span class="cwe-tag">CWE-798</span>
+                </div>
+                <div class="file-loc">config.py:9</div>
+              </div>
+              <div class="card-title">Database connection string with embedded password</div>
+              <div class="card-desc">Identified a database URI containing hardcoded credentials (PostgreSQL, MySQL, MongoDB, Redis).</div>
+              <div class="snippet-box">DATABASE_URL = &quot;postgres://pg_admin:Supe********345!@db-prod.internal:5432/corp_data&quot;</div>
+              <div class="remediation-box">
+                <div><strong>Fix:</strong> Inject database credentials via environment variables or secret stores (e.g., Vault, AWS Secrets Manager).</div>
+              </div>
+            </div>
+            
+
+            <div class="finding-card sev-HIGH" data-severity="HIGH">
+              <div class="card-header">
+                <div class="rule-info">
+                  <span class="sev-pill pill-HIGH">HIGH</span>
+                  <span class="rule-id">PS-SEC-004</span>
+                  <span class="cwe-tag">CWE-798</span>
+                </div>
+                <div class="file-loc">config.py:11</div>
+              </div>
+              <div class="card-title">Slack Webhook or Bot Token exposed</div>
+              <div class="card-desc">Identified a Slack Incoming Webhook URL or Bot OAuth Token (xoxb/xoxp).</div>
+              <div class="snippet-box">SLACK_ALERT_WEBHOOK = &quot;http********uvwx&quot;</div>
+              <div class="remediation-box">
+                <div><strong>Fix:</strong> Revoke the Slack token or webhook URL from the Slack API App dashboard.</div>
+              </div>
+            </div>
+            
+
+            <div class="finding-card sev-HIGH" data-severity="HIGH">
+              <div class="card-header">
+                <div class="rule-info">
+                  <span class="sev-pill pill-HIGH">HIGH</span>
+                  <span class="rule-id">PS-DOCK-002</span>
+                  <span class="cwe-tag">CWE-1104</span>
+                </div>
+                <div class="file-loc">Dockerfile:10</div>
+              </div>
+              <div class="card-title">Unpinned base image tag (:latest or no tag)</div>
+              <div class="card-desc">Base image &#x27;python:latest&#x27; uses mutable &#x27;:latest&#x27; tag.</div>
+              <div class="snippet-box">FROM python:latest</div>
+              <div class="remediation-box">
+                <div><strong>Fix:</strong> Pin the base image to a specific immutable semantic version or SHA256 digest, e.g., `FROM python:3.12.3-slim-bookworm` or `FROM alpine@sha256:...`.</div>
+              </div>
+            </div>
+            
+
+            <div class="finding-card sev-CRITICAL" data-severity="CRITICAL">
+              <div class="card-header">
+                <div class="rule-info">
+                  <span class="sev-pill pill-CRITICAL">CRITICAL</span>
+                  <span class="rule-id">PS-DOCK-003</span>
+                  <span class="cwe-tag">CWE-798</span>
+                </div>
+                <div class="file-loc">Dockerfile:12</div>
+              </div>
+              <div class="card-title">Sensitive credential passed via ENV or ARG</div>
+              <div class="card-desc">A secret, token, key, or password is baked into an ENV or ARG instruction. These values persist in image layer metadata and are visible via `docker history`.</div>
+              <div class="snippet-box">ENV API_SECRET_TOKEN=sk-live-99a8b7c6d5e4f3a2b1c0d9e8</div>
+              <div class="remediation-box">
+                <div><strong>Fix:</strong> Use BuildKit secret mounts (`RUN --mount=type=secret,id=mysecret ...`) or inject runtime environment variables instead of hardcoding in Dockerfile.</div>
+              </div>
+            </div>
+            
+
+            <div class="finding-card sev-HIGH" data-severity="HIGH">
+              <div class="card-header">
+                <div class="rule-info">
+                  <span class="sev-pill pill-HIGH">HIGH</span>
+                  <span class="rule-id">PS-DOCK-004</span>
+                  <span class="cwe-tag">CWE-494</span>
+                </div>
+                <div class="file-loc">Dockerfile:17</div>
+              </div>
+              <div class="card-title">Unverified download and shell execution (curl/wget | sh)</div>
+              <div class="card-desc">The RUN instruction pipes remote network content directly into a shell interpreter (`curl ... | sh` or `wget ... | bash`) without checksum verification.</div>
+              <div class="snippet-box">curl -fsSL https://raw.githubusercontent.com/untrusted/installer.sh | sh</div>
+              <div class="remediation-box">
+                <div><strong>Fix:</strong> Download scripts to a temporary file, verify their cryptographic hash (e.g. `sha256sum -c`), and execute only after integrity verification.</div>
+              </div>
+            </div>
+            
+
+            <div class="finding-card sev-MEDIUM" data-severity="MEDIUM">
+              <div class="card-header">
+                <div class="rule-info">
+                  <span class="sev-pill pill-MEDIUM">MEDIUM</span>
+                  <span class="rule-id">PS-DOCK-005</span>
+                  <span class="cwe-tag">CWE-668</span>
+                </div>
+                <div class="file-loc">Dockerfile:19</div>
+              </div>
+              <div class="card-title">Use of ADD instead of COPY for local files</div>
+              <div class="card-desc">`ADD` has unexpected side effects: it extracts tar archives automatically and accepts remote URLs. Best practice is to use `COPY` for local files.</div>
+              <div class="snippet-box">ADD src/ /app/src/</div>
+              <div class="remediation-box">
+                <div><strong>Fix:</strong> Replace `ADD` with `COPY` unless you explicitly require tar extraction capabilities.</div>
+              </div>
+            </div>
+            
+
+            <div class="finding-card sev-HIGH" data-severity="HIGH">
+              <div class="card-header">
+                <div class="rule-info">
+                  <span class="sev-pill pill-HIGH">HIGH</span>
+                  <span class="rule-id">PS-DOCK-001</span>
+                  <span class="cwe-tag">CWE-250</span>
+                </div>
+                <div class="file-loc">Dockerfile:10</div>
+              </div>
+              <div class="card-title">Container runs as root (missing non-root USER)</div>
+              <div class="card-desc">Container executes as default root user (UID 0).</div>
+              <div class="snippet-box">Missing USER directive</div>
+              <div class="remediation-box">
+                <div><strong>Fix:</strong> Create a dedicated system user/group (e.g., `RUN addgroup -S appgroup &amp;&amp; adduser -S appuser -G appgroup`) and switch to it using `USER appuser`.</div>
+              </div>
+            </div>
+            
+
+            <div class="finding-card sev-LOW" data-severity="LOW">
+              <div class="card-header">
+                <div class="rule-info">
+                  <span class="sev-pill pill-LOW">LOW</span>
+                  <span class="rule-id">PS-DOCK-006</span>
+                  <span class="cwe-tag">CWE-754</span>
+                </div>
+                <div class="file-loc">Dockerfile:1</div>
+              </div>
+              <div class="card-title">Missing HEALTHCHECK instruction</div>
+              <div class="card-desc">No HEALTHCHECK instruction defined in Dockerfile.</div>
+              <div class="snippet-box">Missing HEALTHCHECK</div>
+              <div class="remediation-box">
+                <div><strong>Fix:</strong> Add a `HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD curl -f http://localhost:8080/health || exit 1` instruction.</div>
+              </div>
+            </div>
+            
+
+            <div class="finding-card sev-CRITICAL" data-severity="CRITICAL">
+              <div class="card-header">
+                <div class="rule-info">
+                  <span class="sev-pill pill-CRITICAL">CRITICAL</span>
+                  <span class="rule-id">PS-CICD-001</span>
+                  <span class="cwe-tag">CWE-250</span>
+                </div>
+                <div class="file-loc">deploy.yml:14</div>
+              </div>
+              <div class="card-title">Overly permissive workflow permissions (write-all)</div>
+              <div class="card-desc">The workflow or job explicitly grants `permissions: write-all`. This violates the principle of least privilege and allows compromised steps to write to all repo resources.</div>
+              <div class="snippet-box">permissions: write-all</div>
+              <div class="remediation-box">
+                <div><strong>Fix:</strong> Grant only the minimal required permissions, e.g., `permissions: { contents: read, pull-requests: write }`.</div>
+              </div>
+            </div>
+            
+
+            <div class="finding-card sev-HIGH" data-severity="HIGH">
+              <div class="card-header">
+                <div class="rule-info">
+                  <span class="sev-pill pill-HIGH">HIGH</span>
+                  <span class="rule-id">PS-CICD-002</span>
+                  <span class="cwe-tag">CWE-829</span>
+                </div>
+                <div class="file-loc">deploy.yml:21</div>
+              </div>
+              <div class="card-title">Unpinned GitHub Action (mutable tag/branch used instead of full commit SHA)</div>
+              <div class="card-desc">Action &#x27;actions/checkout&#x27; is pinned to mutable ref &#x27;@v3&#x27; instead of an immutable 40-char commit SHA.</div>
+              <div class="snippet-box">uses: actions/checkout@v3</div>
+              <div class="remediation-box">
+                <div><strong>Fix:</strong> Pin third-party actions to a full 40-character commit SHA, e.g., `uses: actions/checkout@b4ffde5c8fafcde5c04619f5ecd0426728247c1b # v4.1.1`.</div>
+              </div>
+            </div>
+            
+
+            <div class="finding-card sev-CRITICAL" data-severity="CRITICAL">
+              <div class="card-header">
+                <div class="rule-info">
+                  <span class="sev-pill pill-CRITICAL">CRITICAL</span>
+                  <span class="rule-id">PS-CICD-003</span>
+                  <span class="cwe-tag">CWE-78</span>
+                </div>
+                <div class="file-loc">deploy.yml:25</div>
+              </div>
+              <div class="card-title">Potential script injection via untrusted GitHub context in &#x27;run&#x27;</div>
+              <div class="card-desc">Untrusted context &#x27;${{ github.event.pull_request.title }}&#x27; used directly in shell execution script.</div>
+              <div class="snippet-box">echo &quot;Building PR release for: ${{ github.event.pull_request.title }}&quot;</div>
+              <div class="remediation-box">
+                <div><strong>Fix:</strong> Pass untrusted inputs via intermediate environment variables rather than direct inline string interpolation: `env: PR_TITLE: ${{ github.event.pull_request.title }}`.</div>
+              </div>
+            </div>
+            
+
+            <div class="finding-card sev-LOW" data-severity="LOW">
+              <div class="card-header">
+                <div class="rule-info">
+                  <span class="sev-pill pill-LOW">LOW</span>
+                  <span class="rule-id">PS-CICD-005</span>
+                  <span class="cwe-tag">CWE-400</span>
+                </div>
+                <div class="file-loc">deploy.yml:17</div>
+              </div>
+              <div class="card-title">Missing job execution timeout</div>
+              <div class="card-desc">Job &#x27;release&#x27; does not define &#x27;timeout-minutes&#x27;. Runaway jobs could deplete CI minutes.</div>
+              <div class="snippet-box">job &#x27;release&#x27;: missing timeout-minutes</div>
+              <div class="remediation-box">
+                <div><strong>Fix:</strong> Specify a reasonable timeout for each job, e.g., `timeout-minutes: 15`.</div>
+              </div>
+            </div>
+            
+    </div>
+
+    <footer>
+      Generated automatically by <a href="https://github.com/example/pipeshield" target="_blank">PipeShield DevSecOps Scanner</a> | OASIS SARIF 2.1.0 Compatible
+    </footer>
+  </div>
+
+  <script>
+    let currentFilter = 'ALL';
+
+    function filterSeverity(sev) {
+      currentFilter = sev;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.toUpperCase().includes(sev));
+      });
+      applyFilters();
+    }
+
+    function searchFindings() {
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const cards = document.querySelectorAll('.finding-card');
+
+      cards.forEach(card => {
+        const cardSev = card.getAttribute('data-severity');
+        const cardText = card.textContent.toLowerCase();
+
+        const matchesFilter = (currentFilter === 'ALL' || cardSev === currentFilter);
+        const matchesSearch = !query || cardText.includes(query);
+
+        if (matchesFilter && matchesSearch) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
