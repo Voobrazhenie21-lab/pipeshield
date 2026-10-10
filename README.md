@@ -6,8 +6,11 @@
 [![SARIF 2.1.0](https://img.shields.io/badge/SARIF-2.1.0%20Compliant-purple.svg)]()
 [![Security](https://img.shields.io/badge/DevSecOps-Ready-00C7B7.svg)]()
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Interactive_Security_Dashboard-success?style=for-the-badge&logo=googlechrome&logoColor=white)](https://voobrazhenie21-lab.github.io/pipeshield/)
+[![Portfolio Website](https://img.shields.io/badge/💼_Author_Portfolio-voobrazhenie21--lab.github.io-0284c7?style=for-the-badge)](https://voobrazhenie21-lab.github.io/)
 
 > **PipeShield** is a fast, modular DevSecOps security linter and static analyzer built for developers and AppSec engineers. It audits source code and infrastructure-as-code for **hardcoded credentials**, **container hardening violations**, and **CI/CD supply chain risks**, with native **OASIS SARIF 2.1.0** export for GitHub Advanced Security integration.
+>
+> 🔗 **Part of Aleksei Zharkou's Security Ecosystem:** [Main Portfolio](https://voobrazhenie21-lab.github.io/) • [Blue Team DFIR Report (`acme.skb`)](https://voobrazhenie21-lab.github.io/blue-team-incident-investigation/) • [Log Sentinel v1.2](https://voobrazhenie21-lab.github.io/log-sentinel/) • [AD Pentest Report](https://voobrazhenie21-lab.github.io/enterprise-pentest-report/)
 
 ---
 
