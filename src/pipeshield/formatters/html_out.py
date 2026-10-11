@@ -104,13 +104,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   <div class="container">
     <header>
       <div class="brand">
-        <div class="logo-badge">PipeShield</div>
+        <div class="logo-badge">PipeShield v1.1</div>
         <div class="brand-title">
-          <h1>Security Audit Dashboard</h1>
-          <p>Next-Gen DevSecOps Static Analysis & Secret Detection</p>
+          <h1>Security Audit &amp; JS Recon Dashboard</h1>
+          <p>Next-Gen DevSecOps Static Analysis, Secret Detection &amp; Client-Side JS Recon</p>
         </div>
       </div>
-      <div>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <a href="https://voobrazhenie21-lab.github.io/" style="color:#38bdf8; text-decoration:none; font-size:13px; font-weight:600; border:1px solid #30363d; padding:6px 12px; border-radius:6px; background:#161b22;">🏠 Сайт-визитка / Portfolio</a>
+        <a href="https://github.com/Voobrazhenie21-lab/pipeshield" style="color:#c9d1d9; text-decoration:none; font-size:13px; font-weight:600; border:1px solid #30363d; padding:6px 12px; border-radius:6px; background:#161b22;">🐙 GitHub Repo</a>
         <span class="status-badge __STATUS_CLASS__">__STATUS_LABEL__</span>
       </div>
     </header>
@@ -161,7 +163,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
 
     <footer>
-      Generated automatically by <a href="https://github.com/example/pipeshield" target="_blank">PipeShield DevSecOps Scanner</a> | OASIS SARIF 2.1.0 Compatible
+      Generated automatically by <a href="https://github.com/Voobrazhenie21-lab/pipeshield" target="_blank">PipeShield v1.1 DevSecOps &amp; JS Recon Scanner</a> &bull; <a href="https://voobrazhenie21-lab.github.io/" target="_blank">Author Portfolio: Aleksei Zharkou</a> | OASIS SARIF 2.1.0 Compatible
     </footer>
   </div>
 
