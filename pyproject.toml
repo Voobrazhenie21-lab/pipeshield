@@ -1,11 +1,11 @@
 [project]
 name = "pipeshield"
-version = "0.1.0"
-description = "Modern DevSecOps security scanner for Secrets, Dockerfile hardening, and CI/CD supply chain risks"
+version = "1.1.0"
+description = "Modern DevSecOps & Web Recon security scanner for Secrets, Dockerfile hardening, CI/CD supply chain, and JS/TS bundles"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [
-    { name = "Security Engineer", email = "devsecops@example.com" }
+    { name = "Aleksei Zharkou", email = "lyosha.zharkov.98@mail.ru" }
 ]
 keywords = [
     "security",

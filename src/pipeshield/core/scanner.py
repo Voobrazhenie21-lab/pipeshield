@@ -7,6 +7,7 @@ from typing import Sequence
 from pipeshield.analyzers.base import BaseAnalyzer
 from pipeshield.analyzers.cicd_analyzer import CicdAnalyzer
 from pipeshield.analyzers.docker_analyzer import DockerAnalyzer
+from pipeshield.analyzers.js_analyzer import JsReconAnalyzer
 from pipeshield.analyzers.secret_analyzer import SecretAnalyzer
 from pipeshield.config import Config
 from pipeshield.models import Finding, ScanResult, ScanSummary, Severity
@@ -24,7 +25,7 @@ class Scanner:
         self.analyzers: list[BaseAnalyzer] = list(
             analyzers
             if analyzers is not None
-            else [SecretAnalyzer(), DockerAnalyzer(), CicdAnalyzer()]
+            else [SecretAnalyzer(), DockerAnalyzer(), CicdAnalyzer(), JsReconAnalyzer()]
         )
 
     def scan_path(self, target_path: str | Path) -> ScanResult:

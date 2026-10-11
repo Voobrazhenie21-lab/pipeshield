@@ -70,6 +70,7 @@ class Category(str, Enum):
     SECRETS = "SECRETS"
     DOCKER = "CONTAINER"
     CICD = "CI/CD SUPPLY CHAIN"
+    JS_RECON = "JS RECON & WEB"
 
 
 @dataclass

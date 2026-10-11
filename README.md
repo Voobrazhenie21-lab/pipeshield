@@ -20,10 +20,11 @@ In modern software delivery, security vulnerabilities are far cheaper to fix bef
 
 **PipeShield unifies early security checks into a single, high-speed CLI tool:**
 - 🔑 **Secrets & Credential Detection**: High-entropy strings (Shannon entropy analysis) + deterministic regex rules for 40+ credential types (AWS, GitHub, OpenAI, Slack, Stripe, JWT, DB URIs, Private Keys).
+- 🕸️ **JavaScript Bundle Recon & Client-Side Security (`v1.1` New!)**: Scans `.js` / `.ts` / `.jsx` / `.tsx` bundles for hidden administrative/debug API endpoints (`/api/v1/admin`, `/internal/debug`, `/graphql`), dangerous DOM XSS sinks (`innerHTML`, `eval`, `document.write`), exposed `.map` SourceMaps, leaked internal RFC1918 origin IPs behind WAF/CDN, and wildcard `postMessage('*')`.
 - 🐳 **Container Hardening (CIS Docker Benchmark)**: Flags root user execution (`USER root`), mutable `:latest` tags, plaintext credentials in `ENV`/`ARG`, `curl | sh` pipes, and missing health checks.
 - ⛓️ **CI/CD Supply Chain Security**: Detects `permissions: write-all`, unpinned GitHub Actions (mutable tags vs. 40-character commit SHAs), script injection via untrusted PR contexts, and dangerous `pull_request_target` checkouts.
 - 📊 **Enterprise Output Formats**: Rich interactive terminal tables, standalone **Interactive HTML Security Dashboard**, machine-readable **JSON**, and standard **OASIS SARIF 2.1.0** for direct rendering in GitHub's **Security > Code scanning** tab.
-- 🚀 **Zero External Dependencies**: Runs entirely offline in milliseconds without sending your proprietary code to third-party SaaS servers.
+- 🚀 **Zero External Cloud Calls**: Runs entirely offline in milliseconds without sending your proprietary code to third-party SaaS servers.
 
 ---
 
@@ -33,11 +34,12 @@ In modern software delivery, security vulnerabilities are far cheaper to fix bef
 flowchart TD
     subgraph Input ["Repository / Codebase"]
         A[Source Code & Configs]
+        A2[JS / TS Frontend & Node Bundles]
         B[Dockerfile / Containerfile]
         C[CI/CD Workflows .github/workflows]
     end
 
-    subgraph Core ["PipeShield Engine"]
+    subgraph Core ["PipeShield Engine (v1.1)"]
         D[Scanner Orchestrator]
         E[Shannon Entropy Evaluator]
         F[Rule Engine & Suppressions]
@@ -46,6 +48,7 @@ flowchart TD
         G --> G1[SecretAnalyzer]
         G --> G2[DockerAnalyzer]
         G --> G3[CicdAnalyzer]
+        G --> G4[JsReconAnalyzer]
         
         G1 -.-> E
     end
@@ -183,6 +186,11 @@ Output highlights:
 | `PS-CICD-003` | CI/CD | **CRITICAL** | CWE-78 | Potential script injection via untrusted context into inline shell `run` |
 | `PS-CICD-004` | CI/CD | **CRITICAL** | CWE-829 | Dangerous `pull_request_target` trigger with checkout of untrusted PR head |
 | `PS-CICD-005` | CI/CD | **LOW** | CWE-400 | Missing `timeout-minutes` on CI jobs |
+| `PS-JS-001` | JS Recon & Web | **HIGH** | CWE-200 | Hidden administrative, debug, or internal API endpoint in JS/TS bundle |
+| `PS-JS-002` | JS Recon & Web | **HIGH** | CWE-79 | Unsafe DOM XSS sink or dynamic execution (`innerHTML`, `eval`, `document.write`) |
+| `PS-JS-003` | JS Recon & Web | **MEDIUM** | CWE-540 | Exposed production SourceMap reference (`//# sourceMappingURL=*.map`) |
+| `PS-JS-004` | JS Recon & Web | **HIGH** | CWE-200 | Leaked RFC1918 private origin IP or internal `.corp`/`.internal` hostname in JS |
+| `PS-JS-005` | JS Recon & Web | **MEDIUM** | CWE-345 | Insecure cross-window `postMessage(..., '*')` wildcard origin |
 
 ---
 

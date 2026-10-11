@@ -16,6 +16,7 @@ from pipeshield.formatters.sarif import export_sarif
 from pipeshield.models import Severity
 from pipeshield.rules.cicd_rules import CICD_RULES
 from pipeshield.rules.docker_rules import DOCKER_RULES
+from pipeshield.rules.js_rules import JS_RULES
 from pipeshield.rules.secret_rules import SECRET_RULES
 
 
@@ -23,9 +24,9 @@ console = Console()
 
 
 @click.group()
-@click.version_option(version="0.1.0", prog_name="pipeshield")
+@click.version_option(version="1.1.0", prog_name="pipeshield")
 def cli() -> None:
-    """PipeShield: Next-Gen DevSecOps Pipeline Security Scanner."""
+    """PipeShield: Next-Gen DevSecOps & JS Recon Security Scanner."""
     pass
 
 
@@ -137,7 +138,7 @@ def list_rules_command() -> None:
     table.add_column("CWE", style="blue", width=10)
     table.add_column("Rule Title & Description", ratio=1)
 
-    all_rules = list(SECRET_RULES) + list(DOCKER_RULES) + list(CICD_RULES)
+    all_rules = list(SECRET_RULES) + list(DOCKER_RULES) + list(CICD_RULES) + list(JS_RULES)
 
     for r in all_rules:
         sev_badge = f"[{r.severity.color}]{r.severity.value}[/]"
