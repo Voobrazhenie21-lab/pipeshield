@@ -38,7 +38,7 @@ jobs:
           pipeshield scan src/ --sarif pipeshield-results.sarif --fail-on high
 
       - name: Upload SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@6523f22ea01eb3fc2a1232b0a4534102d71921fc # v3.24.8
+        uses: github/codeql-action/upload-sarif@05963f47d870e2cb19a537396c1f668a348c7d8f # v3.24.8
         if: always()
         continue-on-error: true
         with:
